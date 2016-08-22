@@ -1,16 +1,18 @@
 -------
 **thread**
-> pthread\_mutex\_init  :new a mutex
+> pthread_mutex_t mutex=PTHREAD_MUTEX_INITIALIZER;
+> pthread\_mutex\_init (pthread_mutex *mutex,pthread_mutexattr_t *attr) :new a mutex
   pthread\_mutex\_lock  :lock a lock
   pthread\_mutex\_unlock  :unlock
   pthread\_mutex\_trylock 
-  pthread\_mutex\_destroy
+  pthread\_mutex\_destroy (pthread_mutex *mutex)
 
 > pthread\_cond\_init
   pthread\_cond\_destroy
   pthread\_cond\_wait      :bolck and wait
   pthread\_cond\_signal    :signal to wake up another thread
   pthread\_cond\_broadcast :signal to wake up some threads
+  **when in doubt use broadcast **
 
 * int pthread\_create(  pthread\_t \*thread,
 			pthread\_attr\_t \*attr, 
@@ -27,16 +29,45 @@
   pthread\_attr\_set***()
   pthread\_get***()
   pthread\_set***()
+* pthread_mutexattr_t attr;
+  int pthread_mutexattr_init(pthread_mutexattr_t *attr);
+  int pthread_mutexattr_destroy(pthread_mutexaatr_t *attr);
+
+**Cancel**
+* int pthread_cancel(pthread_t thread);
+  int pthread_setcancelstat(int state,int *oldstate);
+  int pthread_setcanceltype(int type,int*oldtype);
+  void pthread_testcancel(void);
+  void pthread_cleanup_push(void(*routine)(void* ),void*arg);
+  void pthread_clean_pop(int * execute);
+  state :enabled / disabled
+  type  :deferred/ asynchronous
+  To cancell a thread need the thread`s identifer
+  : the pthread_t value returned to the creater by `pthread_create`
+  : returned  itself by pthread_self
+  the thread will not be cancelled imdietly  because of pending, i
+  if you need know when thr thread actually terminated ,youn must `join` with it by `pthread_join` after cancelling it
+
 
 **Schedual design**
 * SCHED_OTHER : nonreal-time,normal
   SCHED_RR    : real-time,rotate to run
-  SCHED_FIFO  : real-time,fifo
+  SCHED_FIFO  : real-time,FIFO
 ```
 pthread_attr_t attr;
 pthread_attr_init(&attr);
 pthread_attr_setschedpolicy(&attr, SCHED_FIFO);\/\/sched\_policy
 ```
+**private data**
+* pthread_key_t key;
+  int pthread_key_create(pthread_key *key ,void(*destroy)(void*));
+  int pthread_key_delete(pthread_key_t key);
+* int pthread_setspecific(pthread_ket_t,const void *value);
+  void *pthread_getspecific(pthread_key_t key);
+
+
+
+
 **Priority**
 * static-set:  pthread_attr_setchedparam(&attr,new_priority);
 * dynamic_set:
