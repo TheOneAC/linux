@@ -156,7 +156,7 @@ void client_routine(void* arg)
 		if(strlen(string)==0)break;
 		for(loops=0;loops<4;loops++){
 			sprintf(formatted,"(%d%d) %s",my_number,loops,string);
-			tty_server_request(REQ_WRITE,0,null,formatted);
+			tty_server_request(REQ_WRITE,0,NULL,formatted);
 			sleep(1);
 		}
 	}

@@ -1,4 +1,4 @@
-basic gdb
+#####   basic gdb
 ```
 gcc -g hello.c -o hello
 -g 		：在可执行文件中加入源代码信息，保证调试时gdb能找到源文件
