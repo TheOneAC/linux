@@ -1,4 +1,4 @@
-/*  TCP echo_client  single conennction
+/*  TCP echo_lancher  single conennction
  * zeroarn
  */
 #include <stdio.h>
@@ -10,72 +10,72 @@
 
 #define MAXLINE 50
 #define PORT 8090
-#define SERVERIP "127.0.0.1" // change to test remote ip address of server
+#define waiterIP "127.0.0.1" // change to test  ip address of waiter
 
 int main(){
-  int clientfd;
-  struct sockaddr_in serveraddr;
+  int lancherfd;
+  struct sockaddr_in waiteraddr;
 
   puts("-------------we had lanch the chat program!-----------------");
 
   // init socket
-  clientfd = socket(AF_INET, SOCK_STREAM, 0);
+  lancherfd = socket(AF_INET, SOCK_STREAM, 0);
 
   // check the socket init
-  if (clientfd == -1){
+  if (lancherfd == -1){
     perror("Failed to init socket!");
     return -1;
   }
 
-  // init serveraddr address and port
-  serveraddr.sin_family = AF_INET;
-  serveraddr.sin_addr.s_addr = inet_addr(SERVERIP);
-  serveraddr.sin_port = htons(PORT);
+  // init waiteraddr address and port
+  waiteraddr.sin_family = AF_INET;
+  waiteraddr.sin_addr.s_addr = inet_addr(waiterIP);
+  waiteraddr.sin_port = htons(PORT);
 
-  // connect to remote server
-  if (connect(clientfd, (struct sockaddr *)&serveraddr, sizeof(serveraddr)) < 0){
-    perror("Failed to connect to remote server");
+  // connect to  waiter
+  if (connect(lancherfd, (struct sockaddr *)&waiteraddr, sizeof(waiteraddr)) < 0){
+    perror("Failed to connect to  waiter");
     return -1;
   }
 
-  // inform user that they are connected to the remote server successfully
-  //printf("Connected to server: %s on Port: %d\n", SERVERIP, PORT);
+  // inform user that they are connected to the  waiter successfully
+  //printf("Connected to waiter: %s on Port: %d\n", waiterIP, PORT);
 
-  char message_get[MAXLINE];
-  char message_put[MAXLINE];
+  char message_receive[MAXLINE];
+  char message_send[MAXLINE];
   
   puts("********let`s we chat***********");
   while(1){
       printf("$ > :");
       
-      fgets(message_put,sizeof(message_put),stdin);
-      // send message to remote server
-      if(strlen(message_put) == 1){
+      fgets(message_send,sizeof(message_send),stdin);
+      // send message to  waiter
+      if(strlen(message_send) == 1){
         continue;
       }
       // quit
-      if(strlen(message_get) == 2 && message_get[0] == 'q')break;
-      if (send(clientfd, message_put, sizeof(message_put), 0) < 0){
+      if(strlen(message_receive) == 2 && message_receive[0] == 'q')break;
+      if (send(lancherfd, message_send, sizeof(message_send), 0) < 0){
         perror("Failed to send message!");
         return -1;
       }
       
-      // receive message from server
-      memset(message_get,0,sizeof(message_get));  
+      // receive message from waiter
+      memset(message_receive,0,sizeof(message_receive));  
       int recv_len;    
-      recv_len =  recv(clientfd, message_get, sizeof(message_get), 0);
+      recv_len =  recv(lancherfd, message_receive, sizeof(message_receive), 0);
       if ( recv_len < 0){
         perror("Failed to receive message!");
         return -1;
-      }else if(recv_len == 2 && message_get[0] == '\0')continue;
-      printf("* < %s", message_get);
+      }else if(recv_len == 2 && message_receive[0] == '\0')continue;
+      printf("* < %s", message_receive);
 
   }
 
   // destroy socket
-  close(clientfd);
+  close(lancherfd);
 
-  // logout the server
+  // logout the waiter
   printf("Good Bye\n-----------Thank you for using this program!-------------\n");
   return 0;
 }

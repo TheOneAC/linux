@@ -1,5 +1,5 @@
 /*
- * echo_server
+ * echo_waiter
  */
 #include <stdio.h>
 #include <stdlib.h>
@@ -17,8 +17,8 @@
 #define MAXLINE 50
 
 int main(){
-  int socket_setup, client_socket, client_length;
-  struct sockaddr_in client, server;
+  int socket_setup, lancher_socket, lancher_length;
+  struct sockaddr_in lancher, waiter;
 
   // init tcp socket
   socket_setup = socket(AF_INET, SOCK_STREAM, 0);
@@ -28,13 +28,13 @@ int main(){
     return -1;
   }
 
-  // init server
-  server.sin_family = AF_INET;
-  server.sin_addr.s_addr = INADDR_ANY;
-  server.sin_port = htons(PORT);
+  // init waiter
+  waiter.sin_family = AF_INET;
+  waiter.sin_addr.s_addr = INADDR_ANY;
+  waiter.sin_port = htons(PORT);
 
   // bind socket
-  if(bind(socket_setup,(struct sockaddr *)&server, sizeof(server)) < 0){
+  if(bind(socket_setup,(struct sockaddr *)&waiter, sizeof(waiter)) < 0){
     perror("bind failed");
     return -1;
   }
@@ -44,32 +44,35 @@ int main(){
 
   puts("Waiting for  connections to chat...");
 
-  client_length = sizeof(struct sockaddr_in);
+  lancher_length = sizeof(struct sockaddr_in);
 
-  while((client_socket = accept(socket_setup, (struct sockaddr*)&client, (socklen_t*)&client_length)) > 0){
+  while((lancher_socket = accept(socket_setup, (struct sockaddr*)&lancher, (socklen_t*)&lancher_length)) > 0){
     // connection made
     puts("********let`s we chat***********");
-    char message_from_client[MAXLINE];
-    char message_to_client[MAXLINE];
+    char message_from_lancher[MAXLINE];
+    char message_to_lancher[MAXLINE];
   
     int rece_len;
-    while((rece_len = recv(client_socket, message_from_client, sizeof(message_from_client), 0)) > 0)
+    while((rece_len = recv(lancher_socket, message_from_lancher, sizeof(message_from_lancher), 0)) > 0)
     {
       if(rece_len == -1) perror("\nrecv failed");
-      //message_from_client[rece_len] = '\0';
-      //if(strcmp(message_from_client,"q") == 0)break;
-      printf("* < %s", message_from_client);
-      //puts(message_from_client);
+      //message_from_lancher[rece_len] = '\0';
+      //if(strcmp(message_from_lancher,"q") == 0)break;
+      printf("* < %s", message_from_lancher);
+      //puts(message_from_lancher);
       printf("$ > :");
 
-      fgets(message_to_client,sizeof(message_to_client),stdin);
-      send(client_socket, message_to_client, sizeof(message_to_client), 0);
+      fgets(message_to_lancher,sizeof(message_to_lancher),stdin);
+      if(strlen(message_to_lancher) == 1){
+        continue;
+      }
+      send(lancher_socket, message_to_lancher, sizeof(message_to_lancher), 0);
 
-      memset(message_from_client, 0, sizeof(message_from_client));
+      memset(message_from_lancher, 0, sizeof(message_from_lancher));
 
       
     }
-    close(client_socket);
+    close(lancher_socket);
   }
   return 0;
 }
