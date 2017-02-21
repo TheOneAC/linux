@@ -1,0 +1,2 @@
+gcc pipe.c -o s -lcrypto
+gcc pg.c -o g -lcrypto
