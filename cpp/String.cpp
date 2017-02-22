@@ -1,3 +1,4 @@
+#include <cstring>
 class String{
 	String(const char*str = NULL);
 	String(const String &another);
